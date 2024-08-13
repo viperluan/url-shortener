@@ -1,0 +1,17 @@
+services:
+  db:
+    container_name: shorten_url_db
+    image: postgresql
+    restart: always
+    environment:
+      - POSTGRES_USER=shorten_url
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=shorten_url
+    ports:
+      - 5432:5432
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data:rw
+
+networks:
+  default:
+    name: shorten_url
