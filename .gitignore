@@ -9,3 +9,7 @@ npm-debug.log*
 # Environment variables
 .env
 .env.test
+
+# Build files
+dist/
+build/
