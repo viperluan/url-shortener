@@ -13,3 +13,6 @@ npm-debug.log*
 # Build files
 dist/
 build/
+
+# Database
+pg_data/
