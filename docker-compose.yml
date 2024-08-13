@@ -1,7 +1,7 @@
 services:
   db:
     container_name: shorten_url_db
-    image: postgresql
+    image: postgres
     restart: always
     environment:
       - POSTGRES_USER=shorten_url
