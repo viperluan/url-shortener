@@ -5,7 +5,7 @@ import userRoutes from './userRoutes';
 
 const routes = Router();
 
-routes.use('/', urlRoutes);
+routes.use('/url', urlRoutes);
 routes.use('/user', userRoutes);
 routes.use('/authenticate', authenticateRoutes);
 

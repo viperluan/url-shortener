@@ -1,11 +1,13 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import UserController from '../controllers/UserController';
+import AuthenticateJwtMiddleware from '../middlewares/AuthenticateJwtMiddleware';
 
 const userRoutes = Router();
 
-userRoutes.post('/', (request: Request, response: Response) => {
-  const { email, password } = request.body;
+const authenticateJwtMiddleware = new AuthenticateJwtMiddleware();
+const userController = new UserController();
 
-  return response.json({ email, password });
-});
+userRoutes.get('/', authenticateJwtMiddleware.middleware, userController.getUserData);
+userRoutes.post('/', userController.createUser);
 
 export default userRoutes;

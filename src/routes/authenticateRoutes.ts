@@ -1,11 +1,10 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import AuthenticateController from '../controllers/AuthenticateController';
 
 const authenticateRoutes = Router();
 
-authenticateRoutes.post('/', (request: Request, response: Response) => {
-  const { email, password } = request.body;
+const authenticateController = new AuthenticateController();
 
-  return response.json({ email, password });
-});
+authenticateRoutes.post('/', authenticateController.authenticate);
 
 export default authenticateRoutes;

@@ -1,11 +1,13 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import UrlController from '../controllers/UrlController';
 
 const urlRoutes = Router();
 
-urlRoutes.post('/', (request: Request, response: Response) => {
-  const { url } = request.body;
+const urlController = new UrlController();
 
-  return response.json({ url });
-});
+urlRoutes.get('/:url', urlController.getUrl);
+urlRoutes.post('/shorten', urlController.createUrl);
+urlRoutes.put('/shorten', urlController.editUrl);
+urlRoutes.delete('/shorten/:id', urlController.deleteUrl);
 
 export default urlRoutes;
