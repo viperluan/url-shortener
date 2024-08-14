@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsup src",
     "start": "tsx src/server.ts",
-    "dev": "tsx watch src/server.ts",
+    "start:dev": "tsx watch src/server.ts",
+    "start:debug": "tsx --inspect-brk src/server.ts",
     "lint": "eslint --report-unused-disable-directives --max-warnings 0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,6 +17,7 @@
   "engines": {
     "node": ">=20.16.0"
   },
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^5.18.0",
     "dotenv": "^16.4.5",
