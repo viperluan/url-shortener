@@ -17,7 +17,17 @@ export default class ListDataUserService {
       where: { id },
       select: {
         email: true,
-        urls: true,
+        urls: {
+          where: {
+            deletedAt: null,
+          },
+          select: {
+            original: true,
+            shorten: true,
+            clicks: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 
