@@ -8,7 +8,7 @@ export default class ValidateShortenUrlService {
   }
 
   async execute(url: string) {
-    const shortenUrl = await this.prisma.uRL.findFirst({ where: { shorten: url } });
+    const shortenUrl = await this.prisma.url.findFirst({ where: { shorten: url } });
 
     if (!shortenUrl) return null;
 

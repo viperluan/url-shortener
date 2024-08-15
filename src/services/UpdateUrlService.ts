@@ -8,7 +8,7 @@ export default class UpdateUrlService {
   }
 
   async execute(id: string, newOriginalUrl: string) {
-    return await this.prisma.uRL.update({
+    return await this.prisma.url.update({
       where: { id },
       data: {
         original: newOriginalUrl,

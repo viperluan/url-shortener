@@ -8,7 +8,7 @@ export default class CountClickShortenUrlService {
   }
 
   async execute(urlId: string) {
-    const countClickUrl = await this.prisma.uRL.update({
+    const countClickUrl = await this.prisma.url.update({
       where: { id: urlId },
       data: {
         clicks: { increment: 1 },

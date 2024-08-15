@@ -23,7 +23,7 @@ export default class CreateUrlService {
 
     const shortenUrl = createShortenUrlService.execute();
 
-    const url = await this.prisma.uRL.create({
+    const url = await this.prisma.url.create({
       data: { original: originalUrl, shorten: shortenUrl, userId },
     });
 
