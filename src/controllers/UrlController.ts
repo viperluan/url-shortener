@@ -34,7 +34,7 @@ export default class UrlController {
     const createUrlService = new CreateUrlService();
     const createdUrl = await createUrlService.execute(url, userId);
 
-    const domain = `${request.protocol}://${request.get('host')}/`;
+    const domain = `${request.protocol}://${request.headers.host}${request.baseUrl}/`;
     const createdUrlWithDomain = {
       shortenUrl: domain + createdUrl.shorten,
     };
