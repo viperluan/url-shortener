@@ -20,7 +20,6 @@ export default class CreateUrlService {
 
   async execute(originalUrl: string, userId: string | null): Promise<CreateUrlServiceDTO> {
     const createShortenUrlService = new CreateShortenUrlService();
-
     const shortenUrl = createShortenUrlService.execute();
 
     const url = await this.prisma.url.create({
