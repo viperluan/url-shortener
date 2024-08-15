@@ -11,7 +11,7 @@ urlRoutes.get('/:url', urlController.getShortenUrl);
 
 urlRoutes.get('/', authenticateJwtMiddleware.middleware, urlController.getUrls);
 urlRoutes.post('/', urlController.createUrl);
-urlRoutes.put('/', authenticateJwtMiddleware.middleware, urlController.editUrl);
+urlRoutes.patch('/', authenticateJwtMiddleware.middleware, urlController.editUrl);
 urlRoutes.delete('/:id', authenticateJwtMiddleware.middleware, urlController.deleteUrl);
 
 export default urlRoutes;
