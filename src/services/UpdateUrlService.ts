@@ -8,7 +8,7 @@ export default class UpdateUrlService {
   }
 
   async execute(id: string, newOriginalUrl: string, userId: string) {
-    const findUrl = await this.prisma.url.findFirst({ where: { id, userId } });
+    const findUrl = await this.prisma.url.findFirst({ where: { id, userId, deletedAt: null } });
 
     if (!findUrl) return null;
 

@@ -8,12 +8,14 @@ export default class DeleteUrlService {
   }
 
   async execute(urlId: string, userId: string) {
-    const findUrl = await this.prisma.url.findFirst({ where: { id: urlId, userId } });
+    const findUrl = await this.prisma.url.findFirst({
+      where: { id: urlId, userId, deletedAt: null },
+    });
 
     if (!findUrl) return null;
 
     return await this.prisma.url.update({
-      where: { id: urlId, deletedAt: null },
+      where: { id: urlId },
       data: {
         deletedAt: new Date(),
       },
