@@ -28,12 +28,10 @@ export default class AuthenticateJwtMiddleware {
 
     if (!isValidToken) return response.status(401).json({ message: 'Invalid token.' });
 
-    if (!request.token) {
-      request.token = {
-        id: isValidToken.id,
-        email: isValidToken.email,
-      };
-    }
+    request.token = {
+      id: isValidToken.id,
+      email: isValidToken.email,
+    };
 
     return next();
   }
