@@ -9,7 +9,7 @@ type CreateUserServiceDTO = {
 };
 
 export default class CreateUserService {
-  prisma: PrismaClient;
+  readonly prisma: PrismaClient;
 
   constructor() {
     this.prisma = new PrismaClient();

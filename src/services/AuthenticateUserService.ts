@@ -7,7 +7,7 @@ type AuthenticateUserServiceDTO = {
 };
 
 export default class AuthenticateUserService {
-  prisma: PrismaClient;
+  readonly prisma: PrismaClient;
 
   constructor() {
     this.prisma = new PrismaClient();
@@ -25,7 +25,7 @@ export default class AuthenticateUserService {
       email: findUser.email,
     };
 
-    const token = jwt.sign(payload, config.jwtSecretKey, { expiresIn: '1h' });
+    const token = jwt.sign(payload, config.jwtSecretKey, { expiresIn: '24h' });
 
     return { token };
   }

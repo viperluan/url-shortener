@@ -12,21 +12,21 @@ type CreateUrlServiceDTO = {
 };
 
 export default class CreateUrlService {
-  prisma: PrismaClient;
+  readonly prisma: PrismaClient;
 
   constructor() {
     this.prisma = new PrismaClient();
   }
 
-  async execute(originalUrl: string): Promise<CreateUrlServiceDTO> {
+  async execute(originalUrl: string, userId: string | null): Promise<CreateUrlServiceDTO> {
     const createShortenUrlService = new CreateShortenUrlService();
 
     const shortenUrl = createShortenUrlService.execute();
 
-    const createdUrl = await this.prisma.uRL.create({
-      data: { original: originalUrl, shorten: shortenUrl },
+    const url = await this.prisma.uRL.create({
+      data: { original: originalUrl, shorten: shortenUrl, userId },
     });
 
-    return createdUrl;
+    return url;
   }
 }

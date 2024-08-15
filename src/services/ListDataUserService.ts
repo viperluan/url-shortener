@@ -6,14 +6,20 @@ type ListDataUserServiceDTO = {
 };
 
 export default class ListDataUserService {
-  prisma: PrismaClient;
+  readonly prisma: PrismaClient;
 
   constructor() {
     this.prisma = new PrismaClient();
   }
 
   async execute({ id }: ListDataUserServiceDTO) {
-    const user = await this.prisma.user.findFirst({ where: { id }, include: { urls: true } });
+    const user = await this.prisma.user.findFirst({
+      where: { id },
+      select: {
+        email: true,
+        urls: true,
+      },
+    });
 
     return user;
   }
