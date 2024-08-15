@@ -1,11 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 type CreateUserServiceDTO = {
-  id: string;
   email: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 export default class CreateUserService {
@@ -15,8 +11,15 @@ export default class CreateUserService {
     this.prisma = new PrismaClient();
   }
 
-  async execute(email: string, password: string): Promise<CreateUserServiceDTO> {
-    const user = await this.prisma.user.create({ data: { email, password } });
+  async execute(email: string, password: string): Promise<CreateUserServiceDTO | null> {
+    const findByEmail = await this.prisma.user.findFirst({ where: { email } });
+
+    if (findByEmail) return null;
+
+    const user = await this.prisma.user.create({
+      data: { email, password },
+      select: { email: true },
+    });
 
     return user;
   }

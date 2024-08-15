@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import CreateUserService from '../services/CreateUserService';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import ListDataUserService from '../services/ListDataUserService';
 
 interface IUserControllerRequest extends Request {
@@ -16,30 +15,19 @@ export default class UserController {
 
     if (!email || !password) return response.json();
 
-    try {
-      const createUserService = new CreateUserService();
+    const createUserService = new CreateUserService();
+    const user = await createUserService.execute(email, password);
 
-      const user = await createUserService.execute(email, password);
+    if (!user) return response.status(401).json({ message: 'This email is already in use.' });
 
-      return response.status(201).json(user);
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        return response.status(401).json({ error: 'This email is already in use.' });
-      }
-    }
+    return response.status(201).json(user);
   }
 
   async getUserData(request: IUserControllerRequest, response: Response) {
     if (!request.token) return response.status(401).json({});
 
-    const payload = {
-      id: request.token.id,
-      email: request.token.email,
-    };
-
     const listDataUserService = new ListDataUserService();
-
-    const listUserData = await listDataUserService.execute(payload);
+    const listUserData = await listDataUserService.execute(request.token.id);
 
     return response.json(listUserData);
   }
