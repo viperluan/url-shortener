@@ -16,3 +16,6 @@ build/
 
 # Database
 pg_data/
+
+# IDE
+.vscode/
