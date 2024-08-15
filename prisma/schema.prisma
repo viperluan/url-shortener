@@ -11,12 +11,12 @@ model User {
   id String @id @unique @default(uuid())
   email String @unique
   password String
-  urls URL[]
+  urls Url[]
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
 
-model URL {
+model Url {
   id String @id @unique @default(uuid())
   original String
   shorten String
