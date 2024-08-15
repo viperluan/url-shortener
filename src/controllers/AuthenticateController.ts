@@ -8,9 +8,10 @@ export default class AuthenticateController {
     if (!email || !password) return response.json();
 
     const authenticateUserService = new AuthenticateUserService();
-
     const token = await authenticateUserService.execute(email, password);
 
-    response.status(201).json(token);
+    if (!token) return response.status(401).json({ message: 'Email or password invalid.' });
+
+    return response.status(201).json(token);
   }
 }
