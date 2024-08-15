@@ -17,6 +17,7 @@ export default class ListDataUserService {
             deletedAt: null,
           },
           select: {
+            id: true,
             original: true,
             shorten: true,
             clicks: true,
