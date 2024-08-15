@@ -29,6 +29,8 @@ export default class UserController {
     const listDataUserService = new ListDataUserService();
     const listUserData = await listDataUserService.execute(request.token.id);
 
+    if (!listUserData) return response.status(401).send();
+
     return response.json(listUserData);
   }
 }
