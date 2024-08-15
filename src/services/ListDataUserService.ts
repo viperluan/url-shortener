@@ -1,10 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 
-type ListDataUserServiceDTO = {
-  id: string;
-  email: string;
-};
-
 export default class ListDataUserService {
   readonly prisma: PrismaClient;
 
@@ -12,7 +7,7 @@ export default class ListDataUserService {
     this.prisma = new PrismaClient();
   }
 
-  async execute({ id }: ListDataUserServiceDTO) {
+  async execute(id: string) {
     const user = await this.prisma.user.findFirst({
       where: { id },
       select: {
