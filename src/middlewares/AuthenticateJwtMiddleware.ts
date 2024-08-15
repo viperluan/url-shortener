@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import ValidateUserTokenService from '../services/ValidateUserTokenService';
 
-interface IAuthenticateJwtMiddlewareResponse extends Request {
+interface IAuthenticateJwtMiddlewareRequest extends Request {
   token?: {
     id: string;
     email: string;
@@ -10,7 +10,7 @@ interface IAuthenticateJwtMiddlewareResponse extends Request {
 
 export default class AuthenticateJwtMiddleware {
   middleware(
-    request: IAuthenticateJwtMiddlewareResponse,
+    request: IAuthenticateJwtMiddlewareRequest,
     response: Response,
     next: NextFunction
   ): Response | void {
@@ -23,7 +23,6 @@ export default class AuthenticateJwtMiddleware {
     }
 
     const validateUserTokenService = new ValidateUserTokenService();
-
     const isValidToken = validateUserTokenService.execute(token);
 
     if (!isValidToken) return response.status(401).json({ message: 'Invalid token.' });
