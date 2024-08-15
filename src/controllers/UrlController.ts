@@ -5,6 +5,7 @@ import ValidateShortenUrlService from '../services/ValidateShortenUrlService';
 import CountClickShortenUrlService from '../services/CountClickShortenUrlService';
 import UpdateUrlService from '../services/UpdateUrlService';
 import DeleteUrlService from '../services/DeleteUrlService';
+import ListDataUserService from '../services/ListDataUserService';
 
 interface IUrlControllerRequest extends Request {
   token?: {
@@ -14,6 +15,31 @@ interface IUrlControllerRequest extends Request {
 }
 
 export default class UrlController {
+  async getUrls(request: IUrlControllerRequest, response: Response) {
+    if (!request.token) return response.status(401).send({});
+
+    const listDataUserService = new ListDataUserService();
+    const listUserData = await listDataUserService.execute(request.token.id);
+
+    if (!listUserData) return response.status(401).send();
+
+    return response.json(listUserData);
+  }
+
+  async getShortenUrl(request: Request, response: Response) {
+    const { url } = request.params;
+
+    const validateShortenUrlService = new ValidateShortenUrlService();
+    const shortenUrl = await validateShortenUrlService.execute(url);
+
+    if (!shortenUrl) return response.status(401).json({ message: 'Invalid URL.' });
+
+    const countClickShortenUrlService = new CountClickShortenUrlService();
+    await countClickShortenUrlService.execute(shortenUrl.id);
+
+    return response.redirect(shortenUrl.original);
+  }
+
   async createUrl(request: IUrlControllerRequest, response: Response) {
     const { url } = request.body;
 
@@ -40,20 +66,6 @@ export default class UrlController {
     };
 
     return response.status(201).json(createdUrlWithDomain);
-  }
-
-  async getUrl(request: Request, response: Response) {
-    const { url } = request.params;
-
-    const validateShortenUrlService = new ValidateShortenUrlService();
-    const shortenUrl = await validateShortenUrlService.execute(url);
-
-    if (!shortenUrl) return response.status(401).json({ message: 'Invalid URL.' });
-
-    const countClickShortenUrlService = new CountClickShortenUrlService();
-    await countClickShortenUrlService.execute(shortenUrl.id);
-
-    return response.redirect(shortenUrl.original);
   }
 
   async editUrl(request: IUrlControllerRequest, response: Response) {

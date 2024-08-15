@@ -7,7 +7,9 @@ const urlRoutes = Router();
 const authenticateJwtMiddleware = new AuthenticateJwtMiddleware();
 const urlController = new UrlController();
 
-urlRoutes.get('/:url', urlController.getUrl);
+urlRoutes.get('/:url', urlController.getShortenUrl);
+
+urlRoutes.get('/', authenticateJwtMiddleware.middleware, urlController.getUrls);
 urlRoutes.post('/', urlController.createUrl);
 urlRoutes.put('/', authenticateJwtMiddleware.middleware, urlController.editUrl);
 urlRoutes.delete('/:id', authenticateJwtMiddleware.middleware, urlController.deleteUrl);
