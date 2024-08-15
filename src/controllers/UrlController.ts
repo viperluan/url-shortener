@@ -56,25 +56,28 @@ export default class UrlController {
     return response.redirect(shortenUrl.original);
   }
 
-  async editUrl(request: Request, response: Response) {
+  async editUrl(request: IUrlControllerRequest, response: Response) {
     const { id, newOriginalUrl } = request.body;
+    const { id: userId } = request.token!;
 
     if (!id) return response.status(401).json({ message: 'You must provide a ID.' });
 
     const updateUrlService = new UpdateUrlService();
+    const updatedUrl = await updateUrlService.execute(id, newOriginalUrl, userId);
 
-    const updatedUrl = await updateUrlService.execute(id, newOriginalUrl);
+    if (!updatedUrl) return response.status(401).json({ message: 'ID not found.' });
 
     return response.json(updatedUrl);
   }
 
-  async deleteUrl(request: Request, response: Response) {
+  async deleteUrl(request: IUrlControllerRequest, response: Response) {
     const { id } = request.params;
+    const { id: userId } = request.token!;
 
     if (!id) return response.status(401).json({ message: 'You must provide a ID.' });
 
     const deleteUrlService = new DeleteUrlService();
-    const deletedUrl = await deleteUrlService.execute(id);
+    const deletedUrl = await deleteUrlService.execute(id, userId);
 
     if (!deletedUrl) return response.status(401).json({ message: 'ID not found.' });
 
