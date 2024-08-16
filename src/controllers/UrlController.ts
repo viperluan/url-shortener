@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import CreateUrlService from '../services/CreateUrlService';
-import ValidateUserTokenService from '../services/ValidateUserTokenService';
 import UpdateUrlService from '../services/UpdateUrlService';
 import DeleteUrlService from '../services/DeleteUrlService';
 import GetUrlService from '../services/GetUrlService';
@@ -8,7 +7,7 @@ import GetUrlListService from '../services/GetUrlListService';
 import UpdateClickUrlService from '../services/UpdateClickUrlService';
 import CreateShortenUrlService from '../services/CreateShortenUrlService';
 
-interface IAuthenticatedControllerRequest extends Request {
+interface ITokenRequest extends Request {
   token?: {
     id: string;
     email: string;
@@ -49,7 +48,7 @@ export default class UrlController {
     return response.redirect(url.original);
   }
 
-  async getUrls(request: IAuthenticatedControllerRequest, response: Response) {
+  async getUrls(request: ITokenRequest, response: Response) {
     const getUrlListService = new GetUrlListService();
     const urlList = await getUrlListService.execute(request.token?.id);
 
@@ -58,29 +57,15 @@ export default class UrlController {
     return response.json(urlList);
   }
 
-  async createUrl(request: Request, response: Response) {
+  async createUrl(request: ITokenRequest, response: Response) {
     const { url } = request.body;
     if (!url) return response.status(400).end();
-
-    // Verifica se a solicitação tem token - inicio
-    const token = request.headers.authorization?.split(' ')[1];
-    let userId = null;
-
-    if (token) {
-      const validateUserTokenService = new ValidateUserTokenService();
-      const validatedUserToken = validateUserTokenService.execute(token);
-
-      if (validatedUserToken) {
-        userId = validatedUserToken.id;
-      }
-    }
-    // Verifica se a solicitação tem token - fim
 
     const createShortenUrlService = new CreateShortenUrlService();
     const shortenedUrl = createShortenUrlService.execute();
 
     const createUrlService = new CreateUrlService();
-    const createdUrl = await createUrlService.execute(url, shortenedUrl, userId);
+    const createdUrl = await createUrlService.execute(url, shortenedUrl, request.token?.id);
 
     const link = createdUrl.generateUrlWithDomain(
       request.protocol,
@@ -92,7 +77,7 @@ export default class UrlController {
     return response.status(201).json({ link });
   }
 
-  async updateUrl(request: IAuthenticatedControllerRequest, response: Response) {
+  async updateUrl(request: ITokenRequest, response: Response) {
     const { shortenedUrl, newOriginalUrl } = request.body;
     if (!shortenedUrl) return response.status(400).end();
 
@@ -109,7 +94,7 @@ export default class UrlController {
     return response.json(updatedUrl);
   }
 
-  async deleteUrl(request: IAuthenticatedControllerRequest, response: Response) {
+  async deleteUrl(request: ITokenRequest, response: Response) {
     const { shortenedUrl } = request.params;
     if (!shortenedUrl) return response.status(400).end();
 
