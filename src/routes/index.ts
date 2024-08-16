@@ -5,8 +5,8 @@ import userRoutes from './userRoutes';
 
 const routes = Router();
 
-routes.use('/url', urlRoutes);
 routes.use('/user', userRoutes);
 routes.use('/authenticate', authenticateRoutes);
+routes.use('/', urlRoutes);
 
 export default routes;
