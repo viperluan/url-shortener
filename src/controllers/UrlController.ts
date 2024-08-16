@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import CreateUrlService from '../services/CreateUrlService';
 import ValidateUserTokenService from '../services/ValidateUserTokenService';
-import ValidateShortenUrlService from '../services/ValidateShortenUrlService';
-import CountClickShortenUrlService from '../services/CountClickShortenUrlService';
 import UpdateUrlService from '../services/UpdateUrlService';
 import DeleteUrlService from '../services/DeleteUrlService';
-import ListDataUserService from '../services/ListDataUserService';
+import GetUrlService from '../services/GetUrlService';
+import GetUrlListService from '../services/GetUrlListService';
+import UpdateClickUrlService from '../services/UpdateClickUrlService';
+import CreateShortenUrlService from '../services/CreateShortenUrlService';
 
-interface IUrlControllerRequest extends Request {
+interface IAuthenticatedControllerRequest extends Request {
   token?: {
     id: string;
     email: string;
@@ -15,84 +16,112 @@ interface IUrlControllerRequest extends Request {
 }
 
 export default class UrlController {
-  async getUrls(request: IUrlControllerRequest, response: Response) {
-    if (!request.token) return response.status(401).send({});
+  async headUrl(request: Request, response: Response) {
+    const { shortenedUrl } = request.params;
+    if (!shortenedUrl) return response.status(400).end();
 
-    const listDataUserService = new ListDataUserService();
-    const listUserData = await listDataUserService.execute(request.token.id);
+    const getUrlService = new GetUrlService();
+    const url = await getUrlService.execute(shortenedUrl);
 
-    if (!listUserData) return response.status(401).send();
+    if (!url) return response.status(404).end();
 
-    return response.json(listUserData);
+    return response.status(200).end();
   }
 
-  async getShortenUrl(request: Request, response: Response) {
-    const { url } = request.params;
+  async optionsUrl(request: Request, response: Response) {
+    response.set('Allow', 'HEAD, OPTIONS, GET, POST, PATCH, DELETE');
 
-    const validateShortenUrlService = new ValidateShortenUrlService();
-    const shortenUrl = await validateShortenUrlService.execute(url);
-
-    if (!shortenUrl) return response.status(401).json({ message: 'Invalid URL.' });
-
-    const countClickShortenUrlService = new CountClickShortenUrlService();
-    await countClickShortenUrlService.execute(shortenUrl.id);
-
-    return response.redirect(shortenUrl.original);
+    return response.status(204).end();
   }
 
-  async createUrl(request: IUrlControllerRequest, response: Response) {
+  async getShortenedUrl(request: Request, response: Response) {
+    const { shortenedUrl } = request.params;
+    if (!shortenedUrl) return response.status(400).end();
+
+    const getUrlService = new GetUrlService();
+    const url = await getUrlService.execute(shortenedUrl);
+
+    if (!url) return response.status(400).end();
+
+    const updateClickUrlService = new UpdateClickUrlService();
+    await updateClickUrlService.execute(url.id);
+
+    return response.redirect(url.original);
+  }
+
+  async getUrls(request: IAuthenticatedControllerRequest, response: Response) {
+    const getUrlListService = new GetUrlListService();
+    const urlList = await getUrlListService.execute(request.token?.id);
+
+    if (!urlList) return response.status(400).end();
+
+    return response.json(urlList);
+  }
+
+  async createUrl(request: Request, response: Response) {
     const { url } = request.body;
+    if (!url) return response.status(400).end();
 
-    if (!url) return response.status(401).json({ message: 'You need to provide a URL to short.' });
-
+    // Verifica se a solicitação tem token - inicio
     const token = request.headers.authorization?.split(' ')[1];
     let userId = null;
 
     if (token) {
       const validateUserTokenService = new ValidateUserTokenService();
-      const payload = validateUserTokenService.execute(token);
+      const validatedUserToken = validateUserTokenService.execute(token);
 
-      if (payload) {
-        userId = payload.id;
+      if (validatedUserToken) {
+        userId = validatedUserToken.id;
       }
     }
+    // Verifica se a solicitação tem token - fim
+
+    const createShortenUrlService = new CreateShortenUrlService();
+    const shortenedUrl = createShortenUrlService.execute();
 
     const createUrlService = new CreateUrlService();
-    const createdUrl = await createUrlService.execute(url, userId);
+    const createdUrl = await createUrlService.execute(url, shortenedUrl, userId);
 
-    const domain = `${request.protocol}://${request.headers.host}${request.baseUrl}/`;
-    const createdUrlWithDomain = {
-      shortenUrl: domain + createdUrl.shorten,
-    };
+    const link = createdUrl.generateUrlWithDomain(
+      request.protocol,
+      request.headers.host,
+      request.baseUrl
+    );
 
-    return response.status(201).json(createdUrlWithDomain);
+    return response.status(201).json({ link });
   }
 
-  async editUrl(request: IUrlControllerRequest, response: Response) {
-    const { id, newOriginalUrl } = request.body;
-    const { id: userId } = request.token!;
+  async updateUrl(request: IAuthenticatedControllerRequest, response: Response) {
+    const { shortenedUrl, newOriginalUrl } = request.body;
+    if (!shortenedUrl) return response.status(400).end();
 
-    if (!id) return response.status(401).json({ message: 'You must provide a ID.' });
+    const getUrlService = new GetUrlService();
+    const getUrl = await getUrlService.execute(shortenedUrl);
+
+    if (!getUrl) return response.status(400).end();
 
     const updateUrlService = new UpdateUrlService();
-    const updatedUrl = await updateUrlService.execute(id, newOriginalUrl, userId);
+    const updatedUrl = await updateUrlService.execute(getUrl.id, newOriginalUrl, request.token?.id);
 
-    if (!updatedUrl) return response.status(401).json({ message: 'ID not found.' });
+    if (!updatedUrl) return response.status(400).end();
 
     return response.json(updatedUrl);
   }
 
-  async deleteUrl(request: IUrlControllerRequest, response: Response) {
-    const { id } = request.params;
-    const { id: userId } = request.token!;
+  async deleteUrl(request: IAuthenticatedControllerRequest, response: Response) {
+    const { shortenedUrl } = request.params;
+    if (!shortenedUrl) return response.status(400).end();
 
-    if (!id) return response.status(401).json({ message: 'You must provide a ID.' });
+    const getUrlService = new GetUrlService();
+    const getUrl = await getUrlService.execute(shortenedUrl);
+
+    if (!getUrl) return response.status(400).end();
 
     const deleteUrlService = new DeleteUrlService();
-    const deletedUrl = await deleteUrlService.execute(id, userId);
+    const deletedUrl = await deleteUrlService.execute(request.token?.id, getUrl.userId);
 
-    if (!deletedUrl) return response.status(401).json({ message: 'ID not found.' });
+    if (!deletedUrl) return response.status(400).end();
 
-    return response.status(200).json();
+    return response.status(200).end();
   }
 }

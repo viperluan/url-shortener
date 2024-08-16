@@ -4,14 +4,13 @@ import AuthenticateUserService from '../services/AuthenticateUserService';
 export default class AuthenticateController {
   async authenticate(request: Request, response: Response) {
     const { email, password } = request.body;
-
-    if (!email || !password) return response.json();
+    if (!email || !password) return response.status(400).end();
 
     const authenticateUserService = new AuthenticateUserService();
-    const token = await authenticateUserService.execute(email, password);
+    const authenticateToken = await authenticateUserService.execute(email, password);
 
-    if (!token) return response.status(401).json({ message: 'Email or password invalid.' });
+    if (!authenticateToken) return response.status(400).end();
 
-    return response.status(201).json(token);
+    return response.status(200).json(authenticateToken);
   }
 }
