@@ -8,7 +8,7 @@ export default class CreateUrlService {
     this.prisma = new PrismaClient();
   }
 
-  async execute(originalUrl: string, shortenUrl: string, userId: string | null): Promise<Url> {
+  async execute(originalUrl: string, shortenUrl: string, userId?: string): Promise<Url> {
     const createdUrl = await this.prisma.url.create({
       data: { original: this.ensureHttpProtocolUrl(originalUrl), shorten: shortenUrl, userId },
     });
