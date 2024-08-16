@@ -8,7 +8,7 @@ export default class GetUrlListService {
     this.prisma = new PrismaClient();
   }
 
-  async execute(id: string): Promise<Url[] | null> {
+  async execute(id: string = ''): Promise<Url[] | null> {
     const getUrlList = await this.prisma.url.findMany({
       where: { userId: id, deletedAt: null },
     });

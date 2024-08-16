@@ -7,7 +7,7 @@ export default class DeleteUrlService {
     this.prisma = new PrismaClient();
   }
 
-  async execute(urlId: string, userId?: string | null | undefined) {
+  async execute(urlId: string = '', userId?: string | null | undefined) {
     const deletedUrl = await this.prisma.url.update({
       where: { id: urlId, userId },
       data: {
