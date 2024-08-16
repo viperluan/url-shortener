@@ -10,11 +10,23 @@ export default class CreateUrlService {
 
   async execute(originalUrl: string, shortenUrl: string, userId: string | null): Promise<Url> {
     const createdUrl = await this.prisma.url.create({
-      data: { original: originalUrl, shorten: shortenUrl, userId },
+      data: { original: this.ensureHttpProtocolUrl(originalUrl), shorten: shortenUrl, userId },
     });
 
     const url = new Url(createdUrl.id, createdUrl.original, createdUrl.shorten, createdUrl.clicks);
 
     return url;
+  }
+
+  private ensureHttpProtocolUrl(recievedUrl: string): string {
+    const regex = /^(https?:\/\/)/i;
+
+    if (!regex.test(recievedUrl)) {
+      const addedProtocolToUrl = 'https://' + recievedUrl;
+
+      return addedProtocolToUrl;
+    }
+
+    return recievedUrl;
   }
 }
