@@ -1,7 +1,6 @@
+import { nanoid } from 'nanoid';
 export default class CreateShortenUrlService {
-  async execute(): Promise<string> {
-    const { nanoid } = await import('nanoid');
-
+  execute(): string {
     return nanoid(6);
   }
 }
