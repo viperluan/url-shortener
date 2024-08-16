@@ -116,7 +116,7 @@ export default class UrlController {
     const getUrlService = new GetUrlService();
     const getUrl = await getUrlService.execute(shortenedUrl);
 
-    if (!getUrl) return response.status(400).end();
+    if (!getUrl || getUrl.userId !== request.token?.id) return response.status(400).end();
 
     const deleteUrlService = new DeleteUrlService();
     const deletedUrl = await deleteUrlService.execute(getUrl.id, getUrl.userId);
