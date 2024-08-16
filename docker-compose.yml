@@ -1,4 +1,18 @@
 services:
+  node:
+    container_name: shorten_url_node
+    image: shorten_url_node
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - PORT=3333
+      - JWT_SECRET_KEY=default_security_key
+      - DATABASE_URL=postgresql://shorten_url:1234@db:5432/shorten_url?schema=public
+    ports:
+      - 3333:3333
+
   db:
     container_name: shorten_url_db
     image: postgres
