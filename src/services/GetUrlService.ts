@@ -9,7 +9,9 @@ export default class GetUrlService {
   }
 
   async execute(shortenedUrl: string): Promise<Url | null> {
-    const getUrl = await this.prisma.url.findFirst({ where: { shorten: shortenedUrl } });
+    const getUrl = await this.prisma.url.findFirst({
+      where: { shorten: shortenedUrl, deletedAt: null },
+    });
 
     if (!getUrl) return null;
 
