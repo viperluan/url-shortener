@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import Url from '../models/Url';
 
 export default class UpdateUrlService {
   readonly prisma: PrismaClient;
@@ -7,21 +8,16 @@ export default class UpdateUrlService {
     this.prisma = new PrismaClient();
   }
 
-  async execute(id: string, newOriginalUrl: string, userId: string) {
-    const findUrl = await this.prisma.url.findFirst({ where: { id, userId, deletedAt: null } });
-
-    if (!findUrl) return null;
-
-    return await this.prisma.url.update({
-      where: { id, userId },
+  async execute(urlId: string, newOriginalUrl: string, userId?: string): Promise<Url> {
+    const updatedUrl = await this.prisma.url.update({
+      where: { id: urlId, userId },
       data: {
         original: newOriginalUrl,
       },
-      select: {
-        original: true,
-        shorten: true,
-        clicks: true,
-      },
     });
+
+    const url = new Url(updatedUrl.id, updatedUrl.original, updatedUrl.shorten, updatedUrl.clicks);
+
+    return url;
   }
 }

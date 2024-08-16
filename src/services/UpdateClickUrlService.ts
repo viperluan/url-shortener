@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-export default class CountClickShortenUrlService {
+export default class UpdateClickUrlService {
   readonly prisma: PrismaClient;
 
   constructor() {
@@ -8,13 +8,13 @@ export default class CountClickShortenUrlService {
   }
 
   async execute(urlId: string) {
-    const countClickUrl = await this.prisma.url.update({
+    const updatedClickUrl = await this.prisma.url.update({
       where: { id: urlId },
       data: {
         clicks: { increment: 1 },
       },
     });
 
-    return countClickUrl;
+    return updatedClickUrl;
   }
 }
