@@ -57,6 +57,6 @@ Follow these steps to set up and configure the project:
     
     *This will set up the environment and start the project in detached mode.*
 
-After completing these steps, two containers will be created and bound to ports 5432 and 3333 on the host. If you need to modify these parameters, they are defined as environment variables within the `docker-compose.yml` file.
+After completing these steps, two containers will be created and bound to ports **5432** and **3333** on the host. If you need to modify these parameters, they are defined as environment variables within the `docker-compose.yml` file.
 
 
