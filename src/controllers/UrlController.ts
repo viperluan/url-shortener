@@ -85,7 +85,8 @@ export default class UrlController {
     const link = createdUrl.generateUrlWithDomain(
       request.protocol,
       request.headers.host,
-      request.baseUrl
+      request.baseUrl,
+      shortenedUrl
     );
 
     return response.status(201).json({ link });
@@ -118,7 +119,7 @@ export default class UrlController {
     if (!getUrl) return response.status(400).end();
 
     const deleteUrlService = new DeleteUrlService();
-    const deletedUrl = await deleteUrlService.execute(request.token?.id, getUrl.userId);
+    const deletedUrl = await deleteUrlService.execute(getUrl.id, getUrl.userId);
 
     if (!deletedUrl) return response.status(400).end();
 
