@@ -10,9 +10,10 @@ export default class Url {
   public generateUrlWithDomain(
     protocol: string,
     host: string = 'localhost',
-    baseUrl: string
+    baseUrl: string,
+    shortenUrl: string
   ): string {
-    const link = `${protocol}://${host}${baseUrl}`;
+    const link = `${protocol}://${host}${baseUrl}/${shortenUrl}`;
 
     return link;
   }
