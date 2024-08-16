@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { config } from '../utils/config';
 import jwt from 'jsonwebtoken';
 
-type AuthenticateUserServiceDTO = {
+type AuthenticateUserTokenDTO = {
   token: string;
 };
 
@@ -13,16 +13,10 @@ export default class AuthenticateUserService {
     this.prisma = new PrismaClient();
   }
 
-  async execute(email: string, password: string): Promise<AuthenticateUserServiceDTO | null> {
-    const findUser = await this.prisma.user.findFirst({ where: { email } });
-
-    if (!findUser) return null;
-
-    if (findUser?.password !== password) return null;
-
+  async execute(id: string, email: string): Promise<AuthenticateUserTokenDTO | null> {
     const payload = {
-      id: findUser.id,
-      email: findUser.email,
+      id,
+      email,
     };
 
     const token = jwt.sign(payload, config.jwtSecretKey, { expiresIn: '24h' });
